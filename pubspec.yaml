@@ -1,7 +1,8 @@
 name: native_cache_video_player
 description: "High-performance Flutter video player with native caching for Android and iOS."
 version: 0.1.0
-homepage:
+homepage: https://github.com/danbeyene/native_cache_video_player
+repository: https://github.com/danbeyene/native_cache_video_player
 
 environment:
   sdk: ^3.11.0
