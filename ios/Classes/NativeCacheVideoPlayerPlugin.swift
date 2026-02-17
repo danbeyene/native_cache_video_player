@@ -155,8 +155,11 @@ public class NativeCacheVideoPlayerPlugin: NSObject, FlutterPlugin {
             playersQueue.async { [weak self] in
                 guard let self = self else { return }
                 guard let player = self.players[textureId] else {
+                    // Player was already disposed (e.g. by LRU eviction or memory pressure).
+                    // Return success instead of an error – the caller's intent is satisfied.
+                    print("NCVP: [WARN] No player found for textureId \(textureId) (already disposed). Ignoring \(call.method).")
                     DispatchQueue.main.async {
-                        result(FlutterError(code: "unknown_player", message: "No player found for textureId \(textureId)", details: nil))
+                        result(nil)
                     }
                     return
                 }

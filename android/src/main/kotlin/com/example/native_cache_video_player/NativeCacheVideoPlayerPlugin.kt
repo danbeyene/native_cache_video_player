@@ -221,7 +221,10 @@ class NativeCacheVideoPlayerPlugin: FlutterPlugin, MethodCallHandler {
                             else -> result.notImplemented()
                         }
                     } else {
-                        result.error("unknown_player", "No player found for textureId $textureId", null)
+                        // Player was already disposed (e.g. by LRU eviction or memory pressure).
+                        // Return success instead of an error – the caller's intent is satisfied.
+                        println("NCVP: [WARN] No player found for textureId $textureId (already disposed). Ignoring ${call.method}.")
+                        result.success(null)
                     }
                 } else {
                     result.notImplemented()
