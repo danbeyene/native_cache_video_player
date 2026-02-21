@@ -124,6 +124,20 @@ class NativeCacheVideoPlayer {
 
   bool get isInitialized => _isInitialized;
 
+  /// Checks if the underlying native player has been disposed natively (e.g., due to memory eviction
+  /// or when [dispose] was called).
+  Future<bool> isDisposed() async {
+    if (_isDisposed) return true;
+    if (!_isInitialized || _videoPlayerController == null) return false;
+    
+    final platform = VideoPlayerPlatform.instance;
+    if (platform is NativeCachePlatformExtension) {
+      // ignore: invalid_use_of_visible_for_testing_member
+      return await (platform as NativeCachePlatformExtension).isPlayerDisposed(_videoPlayerController!.playerId);
+    }
+    return false;
+  }
+
   bool get _shouldUseCache {
     return dataSourceType == DataSourceType.network && !kIsWeb && !skipCache;
   }

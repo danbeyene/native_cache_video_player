@@ -154,10 +154,21 @@ public class NativeCacheVideoPlayerPlugin: NSObject, FlutterPlugin {
             
             playersQueue.async { [weak self] in
                 guard let self = self else { return }
+
+                if call.method == "isDisposed" {
+                    let isDisposed = self.players[textureId] == nil
+                    DispatchQueue.main.async {
+                        result(isDisposed)
+                    }
+                    return
+                }
+
                 guard let player = self.players[textureId] else {
                     // Player was already disposed (e.g. by LRU eviction or memory pressure).
                     // Return success instead of an error – the caller's intent is satisfied.
-                    print("NCVP: [WARN] No player found for textureId \(textureId) (already disposed). Ignoring \(call.method).")
+                    if call.method != "position" {
+                        print("NCVP: [WARN] No player found for textureId \(textureId) (already disposed). Ignoring \(call.method).")
+                    }
                     DispatchQueue.main.async {
                         result(nil)
                     }

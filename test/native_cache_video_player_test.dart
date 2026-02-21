@@ -21,6 +21,11 @@ class MockNativeCacheVideoPlayerPlatform extends VideoPlayerPlatform
   }
   
   @override
+  Future<void> dispose(int textureId) async {
+    methodCalls['dispose'] = textureId;
+  }
+  
+  @override
   Future<void> setLooping(int textureId, bool looping) async {}
   
   @override
@@ -69,6 +74,12 @@ class MockNativeCacheVideoPlayerPlatform extends VideoPlayerPlatform
     methodCalls['removeFile'] = url;
     return true;
   }
+
+  @override
+  Future<bool> isPlayerDisposed(int textureId) async {
+    methodCalls['isPlayerDisposed'] = textureId;
+    return false;
+  }
 }
 
 void main() {
@@ -112,6 +123,21 @@ void main() {
     test('enforceCacheLimit() calls platform method with size', () async {
       await NativeCacheVideoPlayer.enforceCacheLimit(maxCacheSize: 100);
       expect(mockPlatform.methodCalls['enforceCacheLimit'], 100);
+    });
+
+    test('isDisposed() returns expected value based on mock platform', () async {
+      final player = NativeCacheVideoPlayer.networkUrl(
+        Uri.parse('https://example.com/video.mp4'),
+      );
+      await player.initialize();
+      
+      final disposed = await player.isDisposed();
+      expect(disposed, isFalse);
+      expect(mockPlatform.methodCalls['isPlayerDisposed'], 123); // textureId
+      
+      await player.dispose();
+      final disposedAfter = await player.isDisposed();
+      expect(disposedAfter, isTrue);
     });
   });
 }

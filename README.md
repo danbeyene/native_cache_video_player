@@ -93,6 +93,17 @@ await player.initialize();
 VideoPlayer(player.controller);
 ```
 
+### Checking Disposed State
+
+If your app handles backgrounding or has a memory limit, the native platform might evict the video player to save resources. You can check if the underlying native player is still active:
+
+```dart
+if (await player.isDisposed()) {
+  // The player was evicted from the native cache LRU queue or disposed manually.
+  // Re-initialize a new NativeCacheVideoPlayer instance if needed to resume playback.
+}
+```
+
 ### Supported Data Sources
 
 The plugin supports various data sources, maintaining API parity with the standard video player:
@@ -156,10 +167,10 @@ await NativeCacheVideoPlayer.enforceCacheLimit(
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please see the [Contributing Guide](CONTRIBUTING.md) for details.
+Contributions are welcome! Please see the [Contributing Guide](https://github.com/danbeyene/native_cache_video_player/blob/main/CONTRIBUTING.md) for details.
 
-1.  **Report Issues**: Submit bugs and feature requests via GitHub Issues.
-2.  **Submit Pull Requests**: Improvements to native implementations or Dart API are appreciated.
+1.  **Report Issues**: Submit bugs and feature requests via [GitHub Issues](https://github.com/danbeyene/native_cache_video_player/issues).
+2.  **Submit Pull Requests**: Improvements to native implementations or Dart API are appreciated. Feel free to open a [Pull Request](https://github.com/danbeyene/native_cache_video_player/pulls).
 
 ---
 

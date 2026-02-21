@@ -1,6 +1,9 @@
-## 0.1.1
+## 0.1.2
 
-* **Bug Fix**: Fixed `PlatformException(unknown_player)` crash when calling methods on players that were already disposed by LRU eviction or memory pressure. Operations on disposed players now gracefully return success instead of throwing.
+* **New Feature**: Added `isDisposed()` method to `NativeCacheVideoPlayer` to allow checking if the underlying native player has been evicted due to memory pressure or LRU cache limits.
+* **Fix**: Suppress `position` warnings when a player is already natively disposed.
+
+## 0.1.1
 
 ## 0.1.0
 

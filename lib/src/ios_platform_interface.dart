@@ -166,6 +166,11 @@ class NativeCacheVideoPlayerPlatform extends VideoPlayerPlatform implements Nati
   Future<bool> enforceCacheLimit(int maxCacheSize) async {
     return await _channel.invokeMethod<bool>('enforceCacheLimit', {'maxCacheSize': maxCacheSize}) ?? false;
   }
+
+  @override
+  Future<bool> isPlayerDisposed(int textureId) async {
+    return await _channel.invokeMethod<bool>('isDisposed', {'textureId': textureId}) ?? true;
+  }
 }
 
 class NativeCacheVideoPlayerPlatformWithEvents extends NativeCacheVideoPlayerPlatform {

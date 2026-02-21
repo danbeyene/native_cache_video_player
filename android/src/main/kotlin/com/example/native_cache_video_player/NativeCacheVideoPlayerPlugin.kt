@@ -185,6 +185,12 @@ class NativeCacheVideoPlayerPlugin: FlutterPlugin, MethodCallHandler {
                         return
                     }
 
+                    if (call.method == "isDisposed") {
+                        val player = synchronized(players) { players[textureId] }
+                        result.success(player == null)
+                        return
+                    }
+
                     val player = synchronized(players) { players[textureId] } // LinkedHashMap.get updates access order if configured as such
                     if (player != null) {
                         when (call.method) {
@@ -223,7 +229,9 @@ class NativeCacheVideoPlayerPlugin: FlutterPlugin, MethodCallHandler {
                     } else {
                         // Player was already disposed (e.g. by LRU eviction or memory pressure).
                         // Return success instead of an error – the caller's intent is satisfied.
-                        println("NCVP: [WARN] No player found for textureId $textureId (already disposed). Ignoring ${call.method}.")
+                        if (call.method != "position") {
+                            println("NCVP: [WARN] No player found for textureId $textureId (already disposed). Ignoring ${call.method}.")
+                        }
                         result.success(null)
                     }
                 } else {

@@ -203,6 +203,11 @@ class NativeCacheVideoPlayerPlatformAndroid extends VideoPlayerPlatform implemen
   Future<bool> enforceCacheLimit(int maxCacheSize) async {
     return await _channel.invokeMethod<bool>('enforceCacheLimit', {'maxCacheSize': maxCacheSize}) ?? false;
   }
+
+  @override
+  Future<bool> isPlayerDisposed(int textureId) async {
+    return await _channel.invokeMethod<bool>('isDisposed', {'textureId': textureId}) ?? true;
+  }
 }
 
 String? _videoFormatString(VideoFormat? format) {

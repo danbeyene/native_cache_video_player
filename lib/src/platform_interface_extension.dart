@@ -12,4 +12,7 @@ abstract class NativeCachePlatformExtension {
 
   /// Enforces the cache size limit by evicting LRU items.
   Future<bool> enforceCacheLimit(int maxCacheSize);
+
+  /// Checks if the native player for the given [textureId] has been disposed (e.g., evicted).
+  Future<bool> isPlayerDisposed(int textureId);
 }
