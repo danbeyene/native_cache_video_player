@@ -1,3 +1,7 @@
+## 0.1.3
+
+* **Fix**: Resolved `java.lang.OutOfMemoryError` on Android by properly unregistering the `EventChannel` stream handler when `FLTVideoPlayer` is disposed, allowing native `ExoPlayer` instances to be garbage collected.
+
 ## 0.1.2
 
 * **New Feature**: Added `isDisposed()` method to `NativeCacheVideoPlayer` to allow checking if the underlying native player has been evicted due to memory pressure or LRU cache limits.
