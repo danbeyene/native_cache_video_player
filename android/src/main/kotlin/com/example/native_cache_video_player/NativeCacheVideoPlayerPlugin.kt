@@ -143,6 +143,11 @@ class NativeCacheVideoPlayerPlugin: FlutterPlugin, MethodCallHandler {
             }
             "setMixWithOthers" -> {
                 mixWithOthers = call.argument<Boolean>("mixWithOthers") ?: false
+                synchronized(players) {
+                    for (player in players.values) {
+                        player.setAudioAttributes(mixWithOthers)
+                    }
+                }
                 result.success(null)
             }
             "clearAllCache" -> {

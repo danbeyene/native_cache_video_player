@@ -97,6 +97,15 @@ public class NativeCacheVideoPlayerPlugin: NSObject, FlutterPlugin {
                 } else {
                     try session.setCategory(.playback, mode: .default, options: [])
                 }
+                
+                // Propagate to existing players
+                playersQueue.async { [weak self] in
+                    guard let self = self else { return }
+                    for player in self.players.values {
+                        player.applyAudioSessionCategory()
+                    }
+                }
+                
                 result(nil)
             } catch {
                 result(FlutterError(code: "set_category_error", message: error.localizedDescription, details: nil))

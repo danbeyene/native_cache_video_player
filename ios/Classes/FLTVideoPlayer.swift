@@ -309,12 +309,23 @@ class FLTVideoPlayer: NSObject, FlutterTexture {
     }
 
     func play() {
+        applyAudioSessionCategory()
         if #available(iOS 10.0, *) {
             // Cap buffering to 5 seconds to prevent heap bloat while playing
             playerItem?.preferredForwardBufferDuration = 5.0
         }
         player?.play()
         displayLink?.isPaused = false
+    }
+    
+    /// Ensures the player respects the current AVAudioSession settings.
+    func applyAudioSessionCategory() {
+        // AVPlayer doesn't strictly need a method call to "mix", 
+        // but we ensure the player's internal state is active if playing.
+        if isPlaying() {
+            // Re-asserting play state can help if the session change caused a pause
+            player?.play()
+        }
     }
     
     func pause() {

@@ -1,4 +1,9 @@
-## 0.1.3
+## 0.1.5
+
+* **Fix**: Resolved issue where `setMixWithOthers` was not propagated to existing player instances on Android and iOS. This ensures that audio focus settings are applied immediately to all active players.
+
+## 0.1.4
+
 
 * **Fix**: Resolved `java.lang.OutOfMemoryError` on Android by properly unregistering the `EventChannel` stream handler when `FLTVideoPlayer` is disposed, allowing native `ExoPlayer` instances to be garbage collected.
 
