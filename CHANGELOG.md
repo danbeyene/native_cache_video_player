@@ -1,3 +1,7 @@
+## 0.1.6
+
+* **Chore**: Bumped `video_player` dependency to `^2.11.1`.
+
 ## 0.1.5
 
 * **Fix**: Resolved issue where `setMixWithOthers` was not propagated to existing player instances on Android and iOS. This ensures that audio focus settings are applied immediately to all active players.
