@@ -186,6 +186,7 @@ class NativeCacheVideoPlayerPlugin: FlutterPlugin, MethodCallHandler {
                         val pTextureId = textureId
                         val player = synchronized(players) { players.remove(pTextureId) }
                         player?.dispose()
+                        EventChannel(binaryMessenger, "native_cache_video_player/videoEvents$textureId").setStreamHandler(null)
                         result.success(null)
                         return
                     }
@@ -250,7 +251,8 @@ class NativeCacheVideoPlayerPlugin: FlutterPlugin, MethodCallHandler {
         channel.setMethodCallHandler(null)
         context.unregisterComponentCallbacks(componentCallbacks)
         synchronized(players) {
-            for (player in players.values) {
+            for ((textureId, player) in players) {
+                EventChannel(binaryMessenger, "native_cache_video_player/videoEvents$textureId").setStreamHandler(null)
                 player.dispose()
             }
             players.clear()

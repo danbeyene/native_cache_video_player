@@ -331,7 +331,6 @@ class FLTVideoPlayer(
             } catch (e: Exception) {}
         }
 
-        eventChannel.setStreamHandler(null)
         eventSink = null
     }
 }

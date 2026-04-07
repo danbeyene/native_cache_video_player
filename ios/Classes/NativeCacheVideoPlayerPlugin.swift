@@ -202,16 +202,16 @@ public class NativeCacheVideoPlayerPlugin: NSObject, FlutterPlugin {
                     let removedPlayer = self.players.removeValue(forKey: textureId)
                     self.playerOrder.removeAll { $0 == textureId }
                     
-                    if let player = removedPlayer {
-                        DispatchQueue.main.async {
+                    DispatchQueue.main.async {
+                        if let player = removedPlayer {
                             self.registrar.textures().unregisterTexture(textureId)
                             player.dispose() // now guaranteed on main thread
                         }
-                    } else {
-                        // Player already gone – just return success (no error)
-                        DispatchQueue.main.async {
-                            result(nil)
-                        }
+                        
+                        let channel = FlutterEventChannel(name: "native_cache_video_player/videoEvents\(textureId)", binaryMessenger: self.registrar.messenger())
+                        channel.setStreamHandler(nil)
+                        
+                        result(nil)
                     }
                     return
                 }

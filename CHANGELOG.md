@@ -1,3 +1,7 @@
+## 0.1.7
+
+* **Fix**: Resolve `MissingPluginException` when disposing video players by correctly unregistering the `EventChannel` stream handler with the texture ID on both Android and iOS.
+
 ## 0.1.6
 
 * **Chore**: Bumped `video_player` dependency to `^2.11.1`.

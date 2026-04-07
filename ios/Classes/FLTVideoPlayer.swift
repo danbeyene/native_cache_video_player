@@ -388,7 +388,6 @@ class FLTVideoPlayer: NSObject, FlutterTexture {
         resourceLoaderDelegate = nil 
         
         // Break event channel retain cycles
-        eventChannel?.setStreamHandler(nil)
         eventChannel = nil
         _eventSink = nil
     }
