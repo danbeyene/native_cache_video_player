@@ -37,6 +37,7 @@ class FLTVideoPlayer(
     private var eventSink: EventChannel.EventSink? = null
     private var surface: Surface? = null
     private var isInitialized = false
+    private var initializedWithZeroSize = false
     private var captionOffset: Long = 0L
 
     // Retry logic
@@ -184,6 +185,15 @@ class FLTVideoPlayer(
             override fun onVideoSizeChanged(videoSize: VideoSize) {
                 if (videoSize.width > 0 && videoSize.height > 0) {
                     textureEntry.setSize(videoSize.width, videoSize.height)
+
+                    // If the initial 'initialized' event was sent with 0×0 dimensions
+                    // (STATE_READY fired before the decoder reported the real size),
+                    // re-send it now with the correct dimensions so the Dart side updates.
+                    if (isInitialized && initializedWithZeroSize) {
+                        initializedWithZeroSize = false
+                        logInfo("Re-sending initialized event with correct size: ${videoSize.width}x${videoSize.height}")
+                        sendInitialized()
+                    }
                 }
 
                 if (isInitialized) {
@@ -249,8 +259,15 @@ class FLTVideoPlayer(
         event["duration"] = exoPlayer?.duration ?: 0L
 
         val size = exoPlayer?.videoSize
-        event["width"] = size?.width ?: 0
-        event["height"] = size?.height ?: 0
+        val w = size?.width ?: 0
+        val h = size?.height ?: 0
+        event["width"] = w
+        event["height"] = h
+
+        // Track if we're sending a 0×0 size so onVideoSizeChanged can fix it later
+        if (w == 0 || h == 0) {
+            initializedWithZeroSize = true
+        }
 
         eventSink?.success(event)
     }

@@ -19,6 +19,7 @@ class FLTVideoPlayer: NSObject, FlutterTexture {
     var textureId: Int64 = -1
     private var isLooping = false
     private var isInitialized = false
+    private var initializedWithZeroSize = false
     private var captionOffset: Int = 0
     
     private var httpHeaders = [String: String]()
@@ -184,8 +185,18 @@ class FLTVideoPlayer: NSObject, FlutterTexture {
                 _eventSink?(values)
             }
         case "presentationSize":
-            if isInitialized { 
-                // Handle size change if needed
+            if isInitialized && initializedWithZeroSize {
+                // The initial 'initialized' event was sent with 0×0 dimensions
+                // (readyToPlay fired before the decoder reported the real size).
+                // Re-send it now with the correct dimensions so the Dart side updates.
+                if let item = playerItem {
+                    let size = item.presentationSize
+                    if size.width > 0 && size.height > 0 {
+                        initializedWithZeroSize = false
+                        print("NCVP: Re-sending initialized event with correct size: \(size.width)x\(size.height)")
+                        sendInitialized()
+                    }
+                }
             }
         case "duration":
             break
@@ -201,8 +212,8 @@ class FLTVideoPlayer: NSObject, FlutterTexture {
     private func sendInitialized() {
         guard let item = playerItem, isInitialized else { return }
         let size = item.presentationSize
-        var width = size.width
-        var height = size.height
+        let width = size.width
+        let height = size.height
         let duration = Int(CMTimeGetSeconds(item.duration) * 1000)
         
         var event: [String: Any] = [:]
@@ -210,6 +221,12 @@ class FLTVideoPlayer: NSObject, FlutterTexture {
         event["duration"] = duration
         event["width"] = width
         event["height"] = height
+        
+        // Track if we're sending a 0×0 size so presentationSize KVO can fix it later
+        if width == 0 || height == 0 {
+            initializedWithZeroSize = true
+        }
+        
         _eventSink?(event)
         
         // Optimization: Manually trigger a frame update so the first frame is visible immediately.

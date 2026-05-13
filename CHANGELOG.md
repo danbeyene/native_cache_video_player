@@ -1,3 +1,7 @@
+## 0.1.8
+
+* **Fix**: Resolve video appearing as black on slower devices where ExoPlayer's `STATE_READY` (Android) or `readyToPlay` (iOS) fires before the video decoder reports the actual frame dimensions. The `initialized` event now re-sends with correct width/height when the native size callback arrives after a 0×0 initialization.
+
 ## 0.1.7
 
 * **Fix**: Resolve `MissingPluginException` when disposing video players by correctly unregistering the `EventChannel` stream handler with the texture ID on both Android and iOS.
