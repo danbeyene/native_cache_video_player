@@ -49,8 +49,17 @@ class NativeCacheVideoPlayerPlugin: FlutterPlugin, MethodCallHandler {
         println("NCVP: [MEMORY] $reason. Purging inactive players.")
         val toRemove = mutableListOf<Long>()
         synchronized(players) {
+            // Count how many players are inactive (not playing)
+            val inactivePlayers = players.entries.filter { !it.value.isPlaying() }
+            // Only purge if we have more than 2 inactive players — keep preloaded ones alive
+            val excess = inactivePlayers.size - 2
+            if (excess <= 0) {
+                println("NCVP: [MEMORY] Only ${inactivePlayers.size} inactive player(s), skipping purge.")
+                return
+            }
+            // Evict the oldest excess inactive players
             for ((textureId, player) in players) {
-                if (!player.isPlaying()) {
+                if (!player.isPlaying() && toRemove.size < excess) {
                     toRemove.add(textureId)
                 }
             }
@@ -238,7 +247,9 @@ class NativeCacheVideoPlayerPlugin: FlutterPlugin, MethodCallHandler {
                         if (call.method != "position") {
                             println("NCVP: [WARN] No player found for textureId $textureId (already disposed). Ignoring ${call.method}.")
                         }
-                        result.success(null)
+                        val reply = java.util.HashMap<String, Any>()
+                        reply["wasDisposed"] = true
+                        result.success(reply)
                     }
                 } else {
                     result.notImplemented()

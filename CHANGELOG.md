@@ -1,3 +1,8 @@
+## 0.1.9
+
+* **Fix**: Reduced aggressiveness of native memory purge (now keeps up to 2 inactive players alive instead of killing all paused players).
+* **Fix**: Plugin methods (like `play`) now return `{"wasDisposed": true}` instead of silently succeeding when called on a player that was already evicted by the memory manager. This allows the Dart side (`isDisposed()`) to correctly detect when a player was killed by memory pressure.
+
 ## 0.1.8
 
 * **Fix**: Resolve video appearing as black on slower devices where ExoPlayer's `STATE_READY` (Android) or `readyToPlay` (iOS) fires before the video decoder reports the actual frame dimensions. The `initialized` event now re-sends with correct width/height when the native size callback arrives after a 0×0 initialization.

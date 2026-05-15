@@ -37,14 +37,28 @@ public class NativeCacheVideoPlayerPlugin: NSObject, FlutterPlugin {
     @objc private func handleMemoryWarning() {
         playersQueue.async { [weak self] in
             guard let self = self else { return }
-            print("NCVP: [MEMORY] Low memory warning. Purging all paused players.")
+            print("NCVP: [MEMORY] Low memory warning. Purging inactive players.")
             
             // Dispose all players that are not currently playing
             // Note: We can only safely dispose on main thread if needed, 
             // but FLTVideoPlayer.dispose handles its own thread safety/cleanup.
             var keysToRemove = [Int64]()
+            var inactivePlayersCount = 0
+            
             for (textureId, player) in self.players {
                 if !player.isPlaying() {
+                    inactivePlayersCount += 1
+                }
+            }
+            
+            let excess = inactivePlayersCount - 2
+            if excess <= 0 {
+                print("NCVP: [MEMORY] Only \(inactivePlayersCount) inactive player(s), skipping purge.")
+                return
+            }
+            
+            for (textureId, player) in self.players {
+                if !player.isPlaying() && keysToRemove.count < excess {
                     keysToRemove.append(textureId)
                 }
             }
@@ -179,7 +193,7 @@ public class NativeCacheVideoPlayerPlugin: NSObject, FlutterPlugin {
                         print("NCVP: [WARN] No player found for textureId \(textureId) (already disposed). Ignoring \(call.method).")
                     }
                     DispatchQueue.main.async {
-                        result(nil)
+                        result(["wasDisposed": true])
                     }
                     return
                 }
